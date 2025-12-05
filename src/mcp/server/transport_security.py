@@ -36,10 +36,10 @@ class TransportSecuritySettings(BaseModel):
 class TransportSecurityMiddleware:
     """Middleware to enforce DNS rebinding protection for MCP transport endpoints."""
 
-    def __init__(self, settings: TransportSecuritySettings | None = None):
+    def __init__(self, settings: TransportSecuritySettings):
         # If not specified, disable DNS rebinding protection by default
         # for backwards compatibility
-        self.settings = settings or TransportSecuritySettings(enable_dns_rebinding_protection=True)
+        self.settings = TransportSecuritySettings(enable_dns_rebinding_protection=True)
 
     def _validate_host(self, host: str | None) -> bool:  # pragma: no cover
         """Validate the Host header against allowed values."""
