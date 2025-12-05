@@ -117,6 +117,9 @@ class TransportSecurityMiddleware:
 
         Returns None if validation passes, or an error Response if validation fails.
         """
+        # LOG DE DEBUG AU DÉBUT
+        print(f"🚀 DEBUG: validate_request called! Host={request.headers.get('host')}", flush=True)
+        
         # Always validate Content-Type for POST requests
         if is_post:  # pragma: no branch
             content_type = request.headers.get("content-type")
@@ -125,8 +128,11 @@ class TransportSecurityMiddleware:
 
         # Skip remaining validation if DNS rebinding protection is disabled
         if not self.settings.enable_dns_rebinding_protection:
+            print(f"⚠️ DEBUG: Protection DISABLED, skip validation", flush=True)
             return None
 
+        print(f"🔒 DEBUG: Protection ENABLED, checking host...", flush=True)
+        
         # Validate Host header  # pragma: no cover
         host = request.headers.get("host")  # pragma: no cover
         if not self._validate_host(host):  # pragma: no cover
