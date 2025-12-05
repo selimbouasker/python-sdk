@@ -43,28 +43,38 @@ class TransportSecurityMiddleware:
 
     def _validate_host(self, host: str | None) -> bool:  # pragma: no cover
         """Validate the Host header against allowed values."""
+        
+        # LOGS DE DEBUG
+        print(f"🔍 DEBUG: Host reçu = {host}", flush=True)
+        print(f"🔍 DEBUG: Allowed hosts = {self.settings.allowed_hosts}", flush=True)
+        print(f"🔍 DEBUG: Protection enabled = {self.settings.enable_dns_rebinding_protection}", flush=True)
+        
         if not host:
             logger.warning("Missing Host header in request")
             return False
 
         # Check exact match first
         if host in self.settings.allowed_hosts:
+            print(f"✅ DEBUG: Exact match trouvé pour {host}", flush=True)
             return True
 
         # Check wildcard port patterns
         for allowed in self.settings.allowed_hosts:
             if allowed.endswith(":*"):
-                # Extract base host from pattern
                 base_host = allowed[:-2]
-                # Check if the actual host starts with base host and has a port
                 if host.startswith(base_host + ":"):
+                    print(f"✅ DEBUG: Wildcard port match: {allowed} -> {host}", flush=True)
                     return True
+            
             if allowed.startswith("*."):
                 domain_suffix = allowed[1:]  # Enlève "*"
+                print(f"🔍 DEBUG: Test wildcard domain: {allowed} vs {host} (suffix={domain_suffix})", flush=True)
                 if host.endswith(domain_suffix):
+                    print(f"✅ DEBUG: Wildcard domain match: {allowed} -> {host}", flush=True)
                     return True
 
         logger.warning(f"Invalid Host header: {host}")
+        print(f"❌ DEBUG: Aucun match trouvé pour {host}", flush=True)
         return False
 
     def _validate_origin(self, origin: str | None) -> bool:  # pragma: no cover
