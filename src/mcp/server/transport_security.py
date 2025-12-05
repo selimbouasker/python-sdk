@@ -22,11 +22,10 @@ class TransportSecuritySettings(BaseModel):
     )
 
     allowed_hosts: list[str] = Field(
-        default=[],
+        default=["localhost", "127.0.0.1", "::1", "*.railway.app", "*.ngrok-free.dev"],
         description="List of allowed Host header values. Only applies when "
         + "enable_dns_rebinding_protection is True.",
     )
-
     allowed_origins: list[str] = Field(
         default=[],
         description="List of allowed Origin header values. Only applies when "
@@ -59,6 +58,10 @@ class TransportSecurityMiddleware:
                 base_host = allowed[:-2]
                 # Check if the actual host starts with base host and has a port
                 if host.startswith(base_host + ":"):
+                    return True
+            if allowed.startswith("*."):
+                domain_suffix = allowed[1:]  # Enlève "*"
+                if host.endswith(domain_suffix):
                     return True
 
         logger.warning(f"Invalid Host header: {host}")
